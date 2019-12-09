@@ -29,7 +29,7 @@ import net.preibisch.mvrecon.fiji.spimdata.boundingbox.BoundingBox;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
-public class MainJob implements Callable<Void> {
+public class FusionV2 implements Callable<Void> {
 	@Option(names = { "-t", "--task" }, required = false, description = "The path of the Data")
 	private String task;
 
@@ -50,7 +50,7 @@ public class MainJob implements Callable<Void> {
 	@Option(names = { "-id" }, required = false, description = "The id of block")
 	private Integer id;
 
-	public MainJob() {
+	public FusionV2() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -160,12 +160,6 @@ public class MainJob implements Callable<Void> {
 	}
 
 	public static void main(String[] args) {
-		// new ImageJ();
-		// String str = "-t proc -i
-		// /Users/Marwan/Desktop/Task/grid-3d-stitched-h5/dataset.xml -o
-		// /Users/Marwan/Desktop/Task/output.n5 -m
-		// /Users/Marwan/Desktop/Task/metadata.json -id 1";
-		// System.out.println(String.join(" ", args));
-		CommandLine.call(new MainJob(), args);
+		CommandLine.call(new FusionV2(), args);
 	}
 }

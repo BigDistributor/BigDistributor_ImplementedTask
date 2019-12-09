@@ -252,7 +252,7 @@
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 						<manifest>
-							<mainClass>net.preibisch.fusiontask.task.MainJob</mainClass>
+							<mainClass>net.preibisch.fusiontask.task.FusionV2</mainClass>
 						</manifest>
 					</archive>
 
