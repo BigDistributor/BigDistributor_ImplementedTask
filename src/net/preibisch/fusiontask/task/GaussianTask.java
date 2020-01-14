@@ -4,7 +4,7 @@ import java.util.concurrent.ExecutorService;
 
 import ij.ImageJ;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.gauss3.Gauss3;
+import net.imglib2.algorithm.gauss3.*;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
