@@ -3,6 +3,8 @@ package net.preibisch.fusiontask.task;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.janelia.saalfeldlab.n5.N5FSWriter;
 import org.janelia.saalfeldlab.n5.N5Writer;
@@ -11,7 +13,6 @@ import org.janelia.saalfeldlab.n5.imglib2.N5Utils;
 
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.sequence.ViewId;
 import net.imglib2.RandomAccessibleInterval;
@@ -22,15 +23,17 @@ import net.preibisch.distribution.algorithm.clustering.kafka.KafkaProperties;
 import net.preibisch.distribution.algorithm.clustering.scripting.JobType;
 import net.preibisch.distribution.algorithm.controllers.items.BlocksMetaData;
 import net.preibisch.distribution.algorithm.task.params.FusionParams;
+import net.preibisch.distribution.algorithm.task.params.NonRigidParams;
 import net.preibisch.distribution.io.img.XMLFile;
 import net.preibisch.distribution.io.img.n5.N5File;
 import net.preibisch.distribution.tools.helpers.ArrayHelpers;
+import net.preibisch.mvrecon.Threads;
 import net.preibisch.mvrecon.fiji.spimdata.boundingbox.BoundingBox;
+import net.preibisch.mvrecon.process.fusion.transformed.nonrigid.NonRigidTools;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
-
-public class Fusion implements Callable<Void> {
+public class NonRigid implements Callable<Void> {
 	@Option(names = { "-t", "--task" }, required = true, description = "The path of the Data")
 	private String task;
 
@@ -81,21 +84,34 @@ public class Fusion implements Callable<Void> {
 
 	public static void blockTask(String inputPath, String metadataPath, String paramPath, String outputPath, int id,int view) {
 		try {
+			final ExecutorService taskExecutor = Executors.newFixedThreadPool( Threads.numThreads() );
 			KafkaManager.log(id, "Start process");
 			BlocksMetaData md = BlocksMetaData.fromJson(metadataPath);
-			FusionParams params = FusionParams.fromJson(paramPath);
+			NonRigidParams params = NonRigidParams.fromJson(paramPath);
 			String jobId = md.getJobId();
 			KafkaProperties.setJobId(jobId);
 			BasicBlockInfo binfo = md.getBlocksInfo().get(id);
-			KafkaManager.log(id, "Bounding box created: " + params.getBb().toString());
-			List<ViewId> viewIds = params.getViewIds().get(view);
-			KafkaManager.log(id, "Got view ids ");
-
-			XMLFile inputFile = XMLFile.XMLFile(inputPath, params.getBb(), params.getDownsampling(), viewIds);
-
+			KafkaManager.log(id, "Bounding box created: " + params.getBoundingBox().toString());
 			KafkaManager.log(id, "Input loaded. ");
-			// XMLFile inputFile = XMLFile.XMLFile(inputPath);
-			RandomAccessibleInterval<FloatType> block = inputFile.fuse(params.getBb(),view);
+			RandomAccessibleInterval<FloatType> block  = NonRigidTools.fuseVirtualInterpolatedNonRigid(
+					params.getSpimData().getSequenceDescription().getImgLoader(),
+					params.getViewRegistrations(),
+					params.getSpimData().getViewInterestPoints().getViewInterestPoints(),
+					params.getSpimData().getSequenceDescription().getViewDescriptions(),
+					params.getViewsToFuse(),
+					params.getViewsToUse(),
+					params.getNonRigidParameters().getLabels(),
+					params.useBlending(),
+					params.useContentBased(),
+					params.getNonRigidParameters().showDistanceMap(),
+					ArrayHelpers.fill( params.getNonRigidParameters().getControlPointDistance(), 3 ),
+					params.getNonRigidParameters().getAlpha(),
+					false,
+					params.getInterpolation(),
+					params.getBoundingBox(),
+					params.getDownsampling(),
+					params.getIntensityAdjustments(),
+					taskExecutor ).getA();
 			KafkaManager.log(id, "Got block. ");
 			N5File outputFile = N5File.open(outputPath);
 			outputFile.saveBlock(block, binfo.getGridOffset());
@@ -134,3 +150,4 @@ public class Fusion implements Callable<Void> {
 		CommandLine.call(new Fusion(), args);
 	}
 }
+
