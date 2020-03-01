@@ -1,4 +1,4 @@
-package net.preibisch.fusiontask.task;
+package net.preibisch.distribution.implimentedtasks.gaussian;
 
 import java.util.concurrent.ExecutorService;
 
@@ -9,18 +9,15 @@ import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.imglib2.view.Views;
-import net.preibisch.distribution.algorithm.AbstractTask2;
-import net.preibisch.distribution.algorithm.controllers.items.callback.AbstractCallBack;
+import net.preibisch.distribution.algorithm.errorhandler.callback.AbstractCallBack;
+import net.preibisch.distribution.algorithm.multithreading.Threads;
 import net.preibisch.distribution.io.img.n5.tests.LoadN5;
-import net.preibisch.distribution.tools.Threads;
-public class  GaussianTask implements AbstractTask2< RandomAccessibleInterval<FloatType>,  RandomAccessibleInterval<FloatType>, Integer> {
+public class  GaussianTask {
 
 	
-	public static void main(String[] args) throws Exception {
-		
+	public static void main(String[] args) throws Exception {		
 		String[] ar = testArgs();
 //		CommandLine.call(new MainJob(new GaussianTask()), ar);
-		
 		show();
 	}
 
@@ -48,7 +45,6 @@ public class  GaussianTask implements AbstractTask2< RandomAccessibleInterval<Fl
 		return args.split(" ");
 	}
 
-	@Override
 	public RandomAccessibleInterval<FloatType> start(RandomAccessibleInterval<FloatType> input, Integer params,
 			AbstractCallBack callback) throws Exception {
 		final ExecutorService service = Threads.createExService(1);
@@ -56,6 +52,5 @@ public class  GaussianTask implements AbstractTask2< RandomAccessibleInterval<Fl
 		Gauss3.gauss(sigmas, Views.extendMirrorSingle(input), input, service);
 		return input;
 	}
-
 
 }
