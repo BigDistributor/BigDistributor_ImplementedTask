@@ -156,7 +156,7 @@
 					<!-- MainClass in mainfest make a executable jar -->
 					<archive>
 						<manifest>
-							<mainClass>net.preibisch.fusiontask.task.Fusion</mainClass>
+							<mainClass>net.preibisch.distribution.implimentedtasks.fusion.Fusion</mainClass>
 						</manifest>
 					</archive>
 

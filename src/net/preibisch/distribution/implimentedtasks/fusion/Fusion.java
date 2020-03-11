@@ -38,16 +38,6 @@ public class Fusion implements BlockTask<FusionClusteringParams>  {
 			KafkaManager.log(blockID, "Bounding box created: " + params.getBoundingBox().toString());
 			RandomAccessibleInterval<FloatType> block = params.fuse(inputPath,binfo.bb());
 		
-			
-//			List<ViewId> viewIds = params.getViewIds().get(view);
-//			KafkaManager.log(blockID, "Got view ids ");
-
-//			XMLFile inputFile = XMLFile.XMLFile(inputPath, params.getBb(), params.getDownsampling(), viewIds);
-
-//			KafkaManager.log(blockID, "Input loaded. ");
-			// XMLFile inputFile = XMLFile.XMLFile(inputPath);
-//			RandomAccessibleInterval<FloatType> block = inputFile.fuse(params.getBb(),view);
-//			KafkaManager.log(blockID, "Got block. ");
 			N5File outputFile = N5File.open(outputPath);
 			outputFile.saveBlock(block, binfo.getGridOffset());
 			KafkaManager.log(blockID, "Task finished " );
