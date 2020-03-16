@@ -29,21 +29,23 @@ public class Fusion implements BlockTask<FusionClusteringParams>  {
 	@Override
 	public void blockTask(String inputPath, String metadataPath, String paramPath, String outputPath, Integer blockID) {
 		try {
-			KafkaManager.log(blockID, "Start process");
 			Metadata md = Metadata.fromJson(metadataPath);
-			FusionClusteringParams params = new FusionClusteringParams().fromJson(new File(paramPath));
 			String jobId = md.getJobID();
+			KafkaManager manager = new KafkaManager(jobId);
+			manager.log(blockID, "Start process");
+			FusionClusteringParams params = new FusionClusteringParams().fromJson(new File(paramPath));
 			KafkaProperties.setJobId(jobId);
 			BasicBlockInfo binfo = md.getBlocksInfo().get(blockID);
-			KafkaManager.log(blockID, "Bounding box created: " + params.getBoundingBox().toString());
+			manager.log(blockID, "Bounding box created: " + params.getBoundingBox().toString());
 			RandomAccessibleInterval<FloatType> block = params.fuse(inputPath,binfo.bb());
 		
 			N5File outputFile = N5File.open(outputPath);
 			outputFile.saveBlock(block, binfo.getGridOffset());
-			KafkaManager.log(blockID, "Task finished " );
-			KafkaManager.done(blockID, "Task finished " );
+			manager.log(blockID, "Task finished " );
+			manager.done(blockID, "Task finished " );
 		} catch (SpimDataException | IOException e) {
-			KafkaManager.error(blockID, e.toString());
+			KafkaManager manager = new KafkaManager("-1");
+			manager.error(blockID, e.toString());
 			e.printStackTrace();
 		}
 	}
