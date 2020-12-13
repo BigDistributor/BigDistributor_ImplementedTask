@@ -1,5 +1,5 @@
-# Fusion task
+# Distributed Tasks
 ### by || [Preibisch Lab](http://preibischlab.mdc-berlin.de) ||
 
-Fusion task from BigStitcher 
-to be runned in the cluster
+ distributed tasks from BigStitcher 
+
