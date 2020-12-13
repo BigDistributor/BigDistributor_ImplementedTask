@@ -1,10 +1,8 @@
-package net.preibisch.distribution.implimentedtasks.gaussian;
-
-import java.util.concurrent.ExecutorService;
+package bigdistributor.tasks.gaussian;
 
 import ij.ImageJ;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.gauss3.*;
+import net.imglib2.algorithm.gauss3.Gauss3;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
@@ -12,6 +10,8 @@ import net.imglib2.view.Views;
 import net.preibisch.distribution.algorithm.errorhandler.callback.AbstractCallBack;
 import net.preibisch.distribution.algorithm.multithreading.Threads;
 import net.preibisch.distribution.io.img.n5.tests.LoadN5;
+
+import java.util.concurrent.ExecutorService;
 public class  GaussianTask {
 
 	

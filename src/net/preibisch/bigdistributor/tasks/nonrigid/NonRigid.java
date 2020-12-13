@@ -1,11 +1,9 @@
-package net.preibisch.distribution.implimentedtasks.nonrigid;
-
-import java.io.File;
-import java.io.IOException;
+package net.preibisch.bigdistributor.tasks.nonrigid;
 
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
+import net.preibisch.bigdistributor.tasks.SpimHelpers;
 import net.preibisch.distribution.algorithm.blockmanagement.blockinfo.BasicBlockInfo;
 import net.preibisch.distribution.algorithm.clustering.kafka.KafkaManager;
 import net.preibisch.distribution.algorithm.clustering.kafka.KafkaProperties;
@@ -13,11 +11,12 @@ import net.preibisch.distribution.algorithm.controllers.items.Metadata;
 import net.preibisch.distribution.algorithm.task.BlockTask;
 import net.preibisch.distribution.algorithm.task.DistributedTask;
 import net.preibisch.distribution.io.img.n5.N5File;
-import net.preibisch.distribution.tasksparam.FusionClusteringParams;
-import net.preibisch.distribution.tasksparam.NonRigidClusteringParams;
 import picocli.CommandLine;
 
-public class NonRigid implements BlockTask<FusionClusteringParams> {
+import java.io.File;
+import java.io.IOException;
+
+public class NonRigid implements BlockTask<NonRigidClusteringParams> {
 
 	public static void main(String[] args) {
 		// new ImageJ();
@@ -41,7 +40,7 @@ public class NonRigid implements BlockTask<FusionClusteringParams> {
 			BasicBlockInfo binfo = md.getBlocksInfo().get(blockID);
 			manager.log(blockID, "Bounding box created: " + params.getBoundingBox().toString());
 			manager.log(blockID, "Input loaded. ");
-			RandomAccessibleInterval<FloatType> block = params.process(inputPath, binfo.bb());
+			RandomAccessibleInterval<FloatType> block = params.process(inputPath, SpimHelpers.getBb(binfo));
 			manager.log(blockID, "Got block. ");
 			N5File outputFile = N5File.open(outputPath);
 			outputFile.saveBlock(block, binfo.getGridOffset());
