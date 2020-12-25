@@ -1,9 +1,9 @@
-package net.preibisch.bigdistributor.tasks;
+package com.bigdistributor.tasks;
 
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.util.Util;
-import net.preibisch.distribution.algorithm.blockmanagement.blockinfo.BasicBlockInfo;
-import net.preibisch.distribution.io.DataExtension;
+import net.preibisch.bigdistributor.algorithm.blockmanagement.blockinfo.BasicBlockInfo;
+import net.preibisch.bigdistributor.io.DataExtension;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.XmlIoSpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.boundingbox.BoundingBox;

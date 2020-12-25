@@ -1,4 +1,4 @@
-package net.preibisch.bigdistributor.serializers;
+package com.bigdistributor.tasks.serializers;
 
 import mpicbg.spim.data.sequence.ViewId;
 

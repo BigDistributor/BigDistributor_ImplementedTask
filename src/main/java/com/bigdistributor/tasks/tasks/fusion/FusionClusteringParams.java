@@ -1,5 +1,6 @@
-package net.preibisch.bigdistributor.tasks.fusion;
+package com.bigdistributor.tasks.tasks.fusion;
 
+import com.bigdistributor.tasks.serializers.AffineTransform3DJsonSerializer;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.Primitives;
@@ -10,10 +11,9 @@ import mpicbg.spim.data.sequence.ViewId;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.real.FloatType;
-import net.preibisch.bigdistributor.serializers.AffineTransform3DJsonSerializer;
-import net.preibisch.bigdistributor.serializers.ViewIdJsonSerializer;
+import com.bigdistributor.tasks.serializers.ViewIdJsonSerializer;
 import net.preibisch.bigdistributor.tasks.SpimHelpers;
-import net.preibisch.distribution.io.serializers.params.SerializableParams;
+import net.preibisch.bigdistributor.io.serializers.params.SerializableParams;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.boundingbox.BoundingBox;
 import net.preibisch.mvrecon.process.fusion.FusionTools;

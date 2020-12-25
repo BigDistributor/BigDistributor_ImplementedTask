@@ -11,7 +11,7 @@
     </parent>
     <groupId>net.preibisch</groupId>
     <artifactId>bigdistributer_task</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <name>BigDistributor implemented tasks</name>
     <description>Tasks for clustering</description>
     <url>https://github.com/PreibischLab/image-clustering</url>
@@ -110,26 +110,25 @@
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>net.preibisch</groupId>
-            <artifactId>dbio</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <groupId>com.bigdistributor</groupId>
+            <artifactId>BigDistributor-core</artifactId>
+            <version>0.1-SNAPSHOT</version>
         </dependency>
-		<dependency>
-			<groupId>net.preibisch</groupId>
-			<artifactId>multiview-reconstruction</artifactId>
-			<version>0.9.1-SNAPSHOT</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>net.preibisch</groupId>-->
+<!--			<artifactId>multiview-reconstruction</artifactId>-->
+<!--			<version>0.9.1-SNAPSHOT</version>-->
+<!--		</dependency>-->
 		<dependency>
 		<groupId>net.preibisch</groupId>
 		<artifactId>BigStitcher</artifactId>
-		<version>0.7.1-SNAPSHOT</version>
+		<version>0.7.0</version>
 	</dependency>
 
     </dependencies>
 
     <build>
-        <sourceDirectory>${basedir}/src/net/preibisch</sourceDirectory>
-
+<!--        <sourceDirectory>${basedir}/src/net/preibisch</sourceDirectory>-->
         <plugins>
 
             <plugin>
@@ -181,7 +180,7 @@
                     <!-- MainClass in mainfest make a executable jar -->
                     <archive>
                         <manifest>
-                            <mainClass>net.preibisch.distribution.implimentedtasks.fusion.Fusion</mainClass>
+                            <mainClass>net.preibisch.com.bigdistributor.tasks.bigdistributor.implimentedtasks.fusion.Fusion</mainClass>
                         </manifest>
                     </archive>
 

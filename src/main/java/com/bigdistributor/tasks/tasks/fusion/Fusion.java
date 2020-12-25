@@ -1,16 +1,16 @@
-package net.preibisch.bigdistributor.tasks.fusion;
+package com.bigdistributor.tasks.tasks.fusion;
 
 import mpicbg.spim.data.SpimDataException;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
 import net.preibisch.bigdistributor.tasks.SpimHelpers;
-import net.preibisch.distribution.algorithm.blockmanagement.blockinfo.BasicBlockInfo;
-import net.preibisch.distribution.algorithm.clustering.kafka.KafkaManager;
-import net.preibisch.distribution.algorithm.clustering.kafka.KafkaProperties;
-import net.preibisch.distribution.algorithm.controllers.items.Metadata;
-import net.preibisch.distribution.algorithm.task.BlockTask;
-import net.preibisch.distribution.algorithm.task.DistributedTask;
-import net.preibisch.distribution.io.img.n5.N5File;
+import net.preibisch.bigdistributor.algorithm.blockmanagement.blockinfo.BasicBlockInfo;
+import net.preibisch.bigdistributor.algorithm.clustering.kafka.KafkaManager;
+import net.preibisch.bigdistributor.algorithm.clustering.kafka.KafkaProperties;
+import net.preibisch.bigdistributor.algorithm.controllers.items.Metadata;
+import net.preibisch.bigdistributor.algorithm.task.BlockTask;
+import net.preibisch.bigdistributor.algorithm.task.DistributedTask;
+import net.preibisch.bigdistributor.io.img.n5.N5File;
 import picocli.CommandLine;
 
 import java.io.File;
