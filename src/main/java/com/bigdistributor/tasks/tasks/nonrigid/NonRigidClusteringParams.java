@@ -12,7 +12,7 @@ import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.real.FloatType;
 import com.bigdistributor.tasks.serializers.ViewIdJsonSerializer;
 import net.preibisch.bigdistributor.tasks.SpimHelpers;
-import net.preibisch.bigdistributor.io.serializers.params.SerializableParams;
+import com.bigdistributor.core.task.items.SerializableParams;
 import net.preibisch.bigdistributor.tools.helpers.ArrayHelpers;
 import net.preibisch.mvrecon.Threads;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;

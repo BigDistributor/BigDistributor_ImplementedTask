@@ -9,8 +9,8 @@
 		<version>29.2.1</version>
         <relativePath/>
     </parent>
-    <groupId>net.preibisch</groupId>
-    <artifactId>bigdistributer_task</artifactId>
+    <groupId>com.bigdistributor</groupId>
+    <artifactId>bigdistributor_tasks</artifactId>
     <version>0.2-SNAPSHOT</version>
     <name>BigDistributor implemented tasks</name>
     <description>Tasks for clustering</description>

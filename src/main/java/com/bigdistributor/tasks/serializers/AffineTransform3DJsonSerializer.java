@@ -1,11 +1,11 @@
 package com.bigdistributor.tasks.serializers;
 
+import com.bigdistributor.io.JsonSerializerDeserializer;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import net.imglib2.realtransform.AffineTransform3D;
-import net.preibisch.bigdistributor.io.serializers.JsonSerializerDeserializer;
 
 import java.lang.reflect.Type;
 
