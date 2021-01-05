@@ -3,100 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.scijava</groupId>
-        <artifactId>pom-scijava</artifactId>
-        <version>29.2.1</version>
-        <relativePath/>
-    </parent>
+
     <groupId>com.bigdistributor</groupId>
     <artifactId>bigdistributor_tasks</artifactId>
     <version>0.2-SNAPSHOT</version>
     <name>BigDistributor implemented tasks</name>
-    <description>Tasks for clustering</description>
-    <url>https://github.com/PreibischLab/image-clustering</url>
-    <inceptionYear>2019</inceptionYear>
-    <organization>
-        <name>Preibisch Lab</name>
-        <url>http://preibischlab.mdc-berlin.de</url>
-    </organization>
-    <licenses>
-        <license>
-            <name>GNU General Public License v2+</name>
-            <url>https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <developers>
-        <developer>
-            <id>StephanPreibisch</id>
-            <name>Stephan Preibisch</name>
-            <url>https://imagej.net/User:StephanP</url>
-            <roles>
-                <role>founder</role>
-                <role>lead</role>
-                <role>developer</role>
-                <role>debugger</role>
-                <role>reviewer</role>
-                <role>support</role>
-                <role>maintainer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>mzouink</id>
-            <name>Marwan Zouinkhi</name>
-            <url>https://imagej.net/User:mzouink</url>
-            <roles>
-                <role>founder</role>
-                <role>lead</role>
-                <role>developer</role>
-                <role>debugger</role>
-                <role>reviewer</role>
-                <role>support</role>
-                <role>maintainer</role>
-            </roles>
-        </developer>
-    </developers>
-    <contributors>
-        <contributor>
-            <name>Curtis Rueden</name>
-            <url>https://imagej.net/User:Rueden</url>
-            <properties>
-                <id>ctrueden</id>
-            </properties>
-        </contributor>
-    </contributors>
-    <mailingLists>
-        <mailingList>
-            <name>Image.sc Forum</name>
-            <archive>https://forum.image.sc/tags/DBioTasks</archive>
-        </mailingList>
-    </mailingLists>
-
-    <scm>
-        <connection>scm:git:git://github.com/PreibischLab/DBioTasks</connection>
-        <developerConnection>scm:git:git@github.com:PreibischLab/DBioTasks</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/PreibischLab/DBioTasks</url>
-    </scm>
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/PreibischLab/DBioTasks/issues</url>
-    </issueManagement>
-    <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/PreibischLab/DBioTasks</url>
-    </ciManagement>
-
-    <properties>
-        <package-name>net.preibisch.fusiontask</package-name>
-
-        <license.licenseName>gpl_v2</license.licenseName>
-        <license.copyrightOwners>Image distribution developers.</license.copyrightOwners>
-
-        <!-- NB: Deploy releases to the SciJava Maven repository. -->
-        <releaseProfiles>deploy-to-scijava</releaseProfiles>
-    </properties>
     <repositories>
         <!-- NB: for project parent -->
         <repository>
@@ -114,11 +25,6 @@
             <artifactId>BigDistributor-core</artifactId>
             <version>0.1-SNAPSHOT</version>
         </dependency>
-        <!--		<dependency>-->
-        <!--			<groupId>net.preibisch</groupId>-->
-        <!--			<artifactId>multiview-reconstruction</artifactId>-->
-        <!--			<version>0.9.1-SNAPSHOT</version>-->
-        <!--		</dependency>-->
         <dependency>
             <groupId>net.preibisch</groupId>
             <artifactId>BigStitcher</artifactId>

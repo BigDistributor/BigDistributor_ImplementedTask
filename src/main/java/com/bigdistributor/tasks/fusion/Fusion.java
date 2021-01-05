@@ -5,6 +5,7 @@ import com.bigdistributor.core.app.BigDistributorApp;
 import com.bigdistributor.core.app.BigDistributorMainApp;
 import com.bigdistributor.core.task.BlockTask;
 import com.bigdistributor.core.task.SparkDistributedTask;
+import mpicbg.spim.data.sequence.ViewId;
 import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.real.FloatType;
@@ -13,13 +14,17 @@ import net.preibisch.mvrecon.fiji.spimdata.boundingbox.BoundingBox;
 import net.preibisch.mvrecon.process.fusion.FusionTools;
 import picocli.CommandLine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @BigDistributorApp(mode = ApplicationMode.ExecutionNode)
 public class Fusion<T extends FloatType, D extends SpimData2, K extends FusionClusteringParams> extends BigDistributorMainApp implements BlockTask<T, D, K> {
 
-    public static void main(String[] args) {
-
-        CommandLine.call(new SparkDistributedTask<FloatType, FusionClusteringParams>(new Fusion()), args);
-
+    public static void main(String[] args) throws Exception {
+        SparkDistributedTask<FloatType, FusionClusteringParams> sparkTask = new SparkDistributedTask<>(new Fusion());
+        new CommandLine(sparkTask).parseArgs(args);
+        sparkTask.call();
+//        CommandLine.call(new SparkDistributedTask<FloatType, FusionClusteringParams>(new Fusion()), args);
     }
 
     @Override
@@ -30,17 +35,31 @@ public class Fusion<T extends FloatType, D extends SpimData2, K extends FusionCl
     }
 
     public RandomAccessibleInterval<FloatType> fuse(SpimData2 spimdata, FusionClusteringParams params, BoundingBox bb) {
-        return FusionTools.fuseVirtual(
-                spimdata.getSequenceDescription().getImgLoader(),
-                params.getRegistrations(),
-                spimdata.getSequenceDescription().getViewDescriptions(),
-                params.getViews(),
-                params.useBlending(),
-                params.useContentBased(),
-                params.getInterpolation(),
-                bb,
-                params.getDownsampling(),
-                params.getIntensityAdjustment()).getA();
+
+
+        if (params != null) {
+
+            return FusionTools.fuseVirtual(
+                    spimdata.getSequenceDescription().getImgLoader(),
+                    params.getRegistrations(),
+                    spimdata.getSequenceDescription().getViewDescriptions(),
+                    params.getViews(),
+                    params.useBlending(),
+                    params.useContentBased(),
+                    params.getInterpolation(),
+                    bb,
+                    params.getDownsampling(),
+                    params.getIntensityAdjustment()).getA();
+
+        } else {
+            int defaultInterpolation = 1;
+            boolean defaultUseBlending = true;
+            double downsampling = 0.0D / 0.0;
+            List<ViewId> views = new ArrayList<>(spimdata.getSequenceDescription().getViewDescriptions().keySet());
+            FusionTools.ImgDataType imgType = FusionTools.ImgDataType.VIRTUAL;
+            return FusionTools.fuseVirtual(spimdata, views, defaultUseBlending, false, defaultInterpolation, bb, downsampling, null).getA();
+        }
+
     }
 
 }

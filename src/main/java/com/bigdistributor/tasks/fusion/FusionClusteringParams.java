@@ -2,8 +2,9 @@ package com.bigdistributor.tasks.fusion;
 
 import com.bigdistributor.core.task.items.SerializableParams;
 import com.bigdistributor.io.mvrecon.SpimHelpers;
-import com.bigdistributor.tasks.serializers.AffineTransform3DJsonSerializer;
-import com.bigdistributor.tasks.serializers.ViewIdJsonSerializer;
+import com.bigdistributor.io.serializers.AffineTransform3DJsonSerializer;
+import com.bigdistributor.io.serializers.IntervalSerializer;
+import com.bigdistributor.io.serializers.ViewIdJsonSerializer;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.internal.Primitives;
@@ -11,6 +12,7 @@ import mpicbg.models.AffineModel1D;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.sequence.ViewDescription;
 import mpicbg.spim.data.sequence.ViewId;
+import net.imglib2.Interval;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.realtransform.AffineTransform3D;
 import net.imglib2.type.numeric.real.FloatType;
@@ -39,6 +41,7 @@ public class FusionClusteringParams extends SerializableParams<FusionClusteringP
         super.init();
         serializers.put(ViewId.class, new ViewIdJsonSerializer());
         serializers.put(AffineTransform3D.class, new AffineTransform3DJsonSerializer());
+        serializers.put(Interval.class,new IntervalSerializer());
     }
 
     public FusionClusteringParams(BoundingBox boundingBox, double downsampling,
