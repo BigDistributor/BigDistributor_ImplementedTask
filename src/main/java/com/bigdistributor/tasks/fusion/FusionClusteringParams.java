@@ -1,4 +1,4 @@
-package com.bigdistributor.tasks.tasks.fusion;
+package com.bigdistributor.tasks.fusion;
 
 import com.bigdistributor.core.task.items.SerializableParams;
 import com.bigdistributor.io.mvrecon.SpimHelpers;

@@ -1,4 +1,4 @@
-package com.bigdistributor.tasks.tasks.fusion;
+package com.bigdistributor.tasks.fusion;
 
 import com.bigdistributor.core.app.ApplicationMode;
 import com.bigdistributor.core.app.BigDistributorApp;
