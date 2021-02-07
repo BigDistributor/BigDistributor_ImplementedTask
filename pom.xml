@@ -8,6 +8,8 @@
     <artifactId>bigdistributor_tasks</artifactId>
     <version>0.2-SNAPSHOT</version>
     <name>BigDistributor implemented tasks</name>
+
+
     <repositories>
         <!-- NB: for project parent -->
         <repository>
@@ -29,6 +31,16 @@
             <groupId>net.preibisch</groupId>
             <artifactId>BigStitcher</artifactId>
             <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>13.0-rc1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.bigdistributor</groupId>
+            <artifactId>BigDistributor_AWS</artifactId>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
@@ -72,7 +84,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-
             <!-- Maven Assembly Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -83,11 +94,12 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+
                     <!-- MainClass in mainfest make a executable jar -->
                     <archive>
                         <manifest>
                             <mainClass>
-                                com.bigdistributor.tasks.fusion.Fusion
+                                com.bigdistributor.tasks.Dispatcher
                             </mainClass>
                         </manifest>
                     </archive>
@@ -106,25 +118,5 @@
             </plugin>
         </plugins>
     </build>
-    <!-- 	<distributionManagement>
-            <repository> <id>github</id> <name>GitHub OWNER Apache Maven Packages</name>
-                <url>https://maven.pkg.github.com/PreibischLab/DBioTasks</url> </repository>
-            <snapshotRepository>
-                <id>nexus-snapshots</id>
-                <url>http://localhost:8084/nexus/content/repositories/snapshots</url>
-            </snapshotRepository>
-        </distributionManagement> -->
-    <distributionManagement>
-        <repository>
-            <id>nexus</id>
-            <name>Releases</name>
-            <url>http://localhost:8084/repository/maven-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>nexus</id>
-            <name>Snapshot</name>
-            <url>http://localhost:8084/repository/maven-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>
