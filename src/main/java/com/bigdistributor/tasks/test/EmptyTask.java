@@ -13,7 +13,6 @@ import net.imglib2.util.Pair;
 import net.imglib2.util.ValuePair;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
-import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
 import java.lang.invoke.MethodHandles;
@@ -24,7 +23,7 @@ import java.util.concurrent.Callable;
 // T: DataType exmpl FloatType
 // K: Task Param
 
-@BigDistributorApp(mode = ApplicationMode.ExecutionNode)
+@BigDistributorApp(task = "test", mode = ApplicationMode.ExecutionNode)
 public class EmptyTask extends BigDistributorMainApp implements Callable<Integer> {
     @Option(names = {"-id", "--jobid"}, required = true, description = "The path of the Data")
     String jobId;
@@ -60,12 +59,6 @@ public class EmptyTask extends BigDistributorMainApp implements Callable<Integer
 
         sparkContext.parallelize(elms, elms.size()).foreach(new EmptySparkJob<>());
         return 0;
-    }
-
-    public static void main(String[] args) {
-        args = "-id test22 -m /Users/Marwan/Desktop/metadata.json".split(" ");
-        int exitCode = new CommandLine(new EmptyTask()).execute(args);
-        System.exit(exitCode);
     }
 
 }

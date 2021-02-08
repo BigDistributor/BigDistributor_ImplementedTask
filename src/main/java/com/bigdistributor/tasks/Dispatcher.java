@@ -40,6 +40,7 @@ public class Dispatcher {
     }
 
     public static void main(String[] args) {
+        args = "fusion".split(" ");
         new Dispatcher(args);
     }
 
