@@ -22,6 +22,7 @@ public class Dispatcher {
             showTasks();
             System.exit(0);
         }
+
         BlockTask application = getApplications(task);
         if (application == null)
             throw new RuntimeException("Task not exist");
