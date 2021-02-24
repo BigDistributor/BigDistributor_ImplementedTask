@@ -41,7 +41,7 @@ public class Dispatcher {
     }
 
     public static void main(String[] args) {
-        args = "fusion".split(" ");
+        System.out.println("Args: " + String.join(" ", args));
         new Dispatcher(args);
     }
 
