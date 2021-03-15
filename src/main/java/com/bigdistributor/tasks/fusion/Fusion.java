@@ -2,7 +2,6 @@ package com.bigdistributor.tasks.fusion;
 
 import com.bigdistributor.core.app.ApplicationMode;
 import com.bigdistributor.core.app.BigDistributorApp;
-import com.bigdistributor.core.app.BigDistributorMainApp;
 import com.bigdistributor.core.task.BlockTask;
 import mpicbg.spim.data.sequence.ViewId;
 import net.imglib2.Interval;
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @BigDistributorApp(task = "fusion" , mode = ApplicationMode.ExecutionNode)
-public class Fusion<T extends FloatType, D extends SpimData2, K extends FusionClusteringParams> extends BigDistributorMainApp implements BlockTask<T, D, K> {
+public class Fusion<T extends FloatType, D extends SpimData2, K extends FusionClusteringParams> implements BlockTask<T, D, K> {
 
     @Override
     public RandomAccessibleInterval<FloatType> blockTask(SpimData2 spimdata, FusionClusteringParams params, Interval interval) {
