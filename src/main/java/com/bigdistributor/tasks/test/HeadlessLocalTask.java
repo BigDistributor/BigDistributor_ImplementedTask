@@ -10,7 +10,7 @@ import java.util.logging.Level;
 
 public class HeadlessLocalTask {
     private final static String input = "dataset-n5.xml";
-    private final static String output = "delete_test.n5";
+    private final static String output = "Process_128.n5";
     private final static String metadata = "metadata.json";
 
     private static final Log logger = Log.getLogger(HeadlessLocalTask.class.getSimpleName());
@@ -20,7 +20,7 @@ public class HeadlessLocalTask {
         Log.setLevel(Level.WARNING);
         AWSCredentialInstance.init(AWS_DEFAULT.AWS_CREDENTIALS_PATH);
 
-        JarParams params = new JarParams("fusion", "delete_test", AWS_DEFAULT.bucket_name,
+        JarParams params = new JarParams("fusion", "2_Process_128", AWS_DEFAULT.bucket_name,
                 input,  output, metadata,
                 "", AWSCredentialInstance.get());
 
