@@ -60,7 +60,7 @@
     </dependencies>
 
     <build>
-        <finalName>RS-Fish</finalName>
+        <finalName>BigDistributorTasks</finalName>
         <plugins>
 
             <!-- other Maven plugins ... -->
