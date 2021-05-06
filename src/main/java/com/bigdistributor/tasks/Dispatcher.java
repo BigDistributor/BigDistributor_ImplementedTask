@@ -20,7 +20,6 @@ public class Dispatcher {
         String task = args[0];
         if (task.equalsIgnoreCase("get")) {
             showTasks();
-            System.exit(0);
         }
 
         Class<BlockTask> application = getApplications(task);
@@ -28,7 +27,6 @@ public class Dispatcher {
             throw new RuntimeException("Task not exist");
         String[] taskArgs = Arrays.copyOfRange(args, 1, args.length);
         int exitCode = new CommandLine(new AWSSparkDistributor<>(application)).execute(taskArgs);
-        System.exit(exitCode);
     }
 
     private void showTasks() {
