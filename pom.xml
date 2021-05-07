@@ -57,6 +57,11 @@
             <artifactId>imglib2</artifactId>
             <version>5.10.0</version>
         </dependency>
+        <dependency>
+            <groupId>net.preibisch</groupId>
+            <artifactId>multiview-reconstruction</artifactId>
+            <version>${multiview-reconstruction.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
