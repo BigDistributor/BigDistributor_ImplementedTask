@@ -32,7 +32,6 @@ import net.imglib2.img.array.ArrayImg;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.preibisch.legacy.io.IOFunctions;
-import net.preibisch.mvrecon.fiji.plugin.Image_Fusion;
 import net.preibisch.mvrecon.fiji.spimdata.SpimData2;
 import net.preibisch.mvrecon.fiji.spimdata.XmlIoSpimData2;
 import net.preibisch.mvrecon.process.deconvolution.DeconView;
@@ -69,11 +68,6 @@ public class ImageDeconvolution  {
     private static String defaultXMLfilename;
 
     public void run() throws SpimDataException {
-        // ask for everything but the channels
-//        final LoadParseQueryXML result = new LoadParseQueryXML();
-//
-//        if (!result.queryXML("Dataset (Multiview) Deconvolution", true, true, true, true, true))
-//            return;
         SpimData2 spimdata = new XmlIoSpimData2("").load(defaultXMLfilename);
         List<ViewId> views = new ArrayList<>(spimdata.getSequenceDescription().getViewDescriptions().keySet());
 //        List<ViewSetup> viewSetups = new ArrayList<>(spimdata.getSequenceDescription().getViewSetupsOrdered());
@@ -100,17 +94,17 @@ public class ImageDeconvolution  {
             final ExecutorService service) {
         final Deconvolution decon = new Deconvolution(spimData, viewList, service);
 
-        if (!decon.queryDetails())
-            return false;
+        if (!decon.checkParams()){
+            System.out.println("Invalid task params");
+            return false;}
 
         // query exporter parameters
-        final ImgExport exporter = decon.getNewExporterInstance();
+        //TODO change exporter
+        final ImgExport exporter = decon.getExportTiff();
 
         // query exporter parameters
-        if (!exporter.queryParameters(decon))
-            return false;
 
-        final List<Group<ViewDescription>> deconGroupBatches = decon.getFusionGroups();
+        final List<Group<ViewDescription>> deconGroupBatches = FusionGroup.getFusionGroups(spimData,viewList,decon.getSplittingType());
         int i = 0;
 
         for (final Group<ViewDescription> deconGroup : Group.getGroupsSorted(deconGroupBatches)) {
@@ -144,7 +138,7 @@ public class ImageDeconvolution  {
                     true,
                     decon.getBlendingRange(),
                     decon.getBlendingBorder() / (Double.isNaN(downsampling) ? 1.0f : (float) downsampling),
-                    decon.adjustIntensities() ? spimData.getIntensityAdjustments().getIntensityAdjustments() : null);
+                    decon.isAdjustIntensities() ? spimData.getIntensityAdjustments().getIntensityAdjustments() : null);
 
             IOFunctions.println("(" + new Date(System.currentTimeMillis()) + "): Fusion of 'virtual views' ");
             fusion.fuseGroups();
@@ -200,6 +194,8 @@ public class ImageDeconvolution  {
                 final ArrayList<DeconView> deconViews = new ArrayList<>();
 
                 for (final Group<ViewDescription> virtualView : Group.getGroupsSorted(fusion.getGroups())) {
+                    System.out.println("all:"+Group.getGroupsSorted(fusion.getGroups()).size());
+                    System.out.println(1); System.out.println(1); System.out.println(1); System.out.println(1);
                     final DeconView view = new DeconView(
                             service,
                             fusion.getImages().get(virtualView),
@@ -212,10 +208,10 @@ public class ImageDeconvolution  {
 
                     if (view.getNumBlocks() <= 0)
                         return false;
-
+                    System.out.println(2); System.out.println(2); System.out.println(2);
                     view.setTitle(Group.gvids(virtualView));
                     deconViews.add(view);
-
+                    System.out.println(1); System.out.println(1); System.out.println(1);
                     IOFunctions.println("(" + new Date(System.currentTimeMillis()) + "): Added " + view);
                 }
 
@@ -272,7 +268,7 @@ public class ImageDeconvolution  {
             final Deconvolution fusion,
             final ImgExport exporter,
             final Group<ViewDescription> group) {
-        final String title = Image_Fusion.getTitle(fusion.getSplittingType(), group);
+        final String title = fusion.getSplittingType().getTitle(group);
 
         return exporter.exportImage(output, fusion.getBoundingBox(), fusion.getDownsampling(), Double.NaN, title, group);
     }

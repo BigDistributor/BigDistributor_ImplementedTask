@@ -41,7 +41,6 @@ import net.imglib2.img.cell.CellImgFactory;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Util;
 import net.preibisch.legacy.io.IOFunctions;
-import net.preibisch.mvrecon.fiji.plugin.fusion.FusionExportInterface;
 import net.preibisch.mvrecon.fiji.plugin.fusion.FusionGUI;
 import net.preibisch.mvrecon.fiji.plugin.fusion.NonRigidParametersGUI;
 import net.preibisch.mvrecon.fiji.plugin.util.GUIHelper;
@@ -67,7 +66,6 @@ import net.preibisch.mvrecon.process.deconvolution.iteration.mul.ComputeBlockMul
 import net.preibisch.mvrecon.process.deconvolution.iteration.sequential.ComputeBlockSeqThreadCPUFactory;
 import net.preibisch.mvrecon.process.deconvolution.iteration.sequential.ComputeBlockSeqThreadCUDAFactory;
 import net.preibisch.mvrecon.process.downsampling.DownsampleTools;
-import net.preibisch.mvrecon.process.export.ImgExport;
 import net.preibisch.mvrecon.process.fusion.FusionTools;
 import net.preibisch.mvrecon.process.fusion.FusionTools.ImgDataType;
 import net.preibisch.mvrecon.process.fusion.transformed.TransformVirtual;
@@ -82,12 +80,22 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Deconvolution implements FusionExportInterface
+
+public class Deconvolution
 {
 //    public final static ArrayList< ImgExport > staticImgExportAlgorithms = new ArrayList< ImgExport >();
 //    public final static String[] imgExportDescriptions;
 
+
     private static final TiffExporter exportTiff = new TiffExporter( null );
+
+
+
+    public static TiffExporter getExportTiff() {
+        return exportTiff;
+    }
+
+
 
     static
     {
@@ -124,16 +132,9 @@ public class Deconvolution implements FusionExportInterface
             "Approximated average intensity (fast option)",
             "From TIFF file (dimensions must match bounding box)" };
 
-    public static String[] splittingTypes = new String[]{
-            "Each timepoint & channel",
-            "Each timepoint, channel & illumination",
-            "All views together",
-            "Each view" };
-
     public static int defaultBB = 0;
-    public static int defaultInputImgCacheType = 1;
-    public static int defaultWeightCacheType = 1;
-    public static double defaultDownsampling = 1.0;
+    public static ImgDataType defaultInputImgCacheType = ImgDataType.CACHED;
+    public static double defaultDownsampling = 8.0;
     public static boolean defaultAdjustIntensities = false;
     public static boolean defaultMul = false;
     public static int defaultPSFType = 1;
@@ -144,7 +145,7 @@ public class Deconvolution implements FusionExportInterface
     public static int defaultDebugInterval = 1;
     public static boolean defaultUseTikhonovRegularization = true;
     public static double defaultLambda = 0.006;
-    public static int defaultBlockSizeIndex = 1;
+    public static int defaultBlockSizeIndex = 0;
     public static int defaultBlockSizeX = 384, defaultBlockSizeY = 384, defaultBlockSizeZ = 384;
     public static boolean defaultTestEmptyBlocks = true;
     public static int defaultCacheBlockSize = MultiViewDeconvolution.cellDim;
@@ -157,17 +158,17 @@ public class Deconvolution implements FusionExportInterface
     public static boolean defaultAdditionalSmoothBlending = MultiViewDeconvolution.additionalSmoothBlending;
     public static boolean defaultGroupTiles = true;
     public static boolean defaultGroupIllums = true;
-    public static int defaultSplittingType = 0;
+    public static FusionGroup defaultSplittingType = FusionGroup.Each_Timepoint_Channel_Illumination;
     public static int defaultImgExportAlgorithm = 1;
     public static String defaultPsiStartFile = "";
     public static boolean defaultPreciseAvgMax = true;
-
+    public static int defaultWeightCacheType = 1;
 
     protected int boundingBox = defaultBB;
     protected double downsampling = defaultDownsampling;
     protected boolean adjustIntensities = defaultAdjustIntensities;
     protected boolean mul = defaultMul;
-    protected int cacheTypeInputImg = defaultInputImgCacheType;
+    protected ImgDataType cacheTypeInputImg = defaultInputImgCacheType;
     protected int cacheTypeWeights = defaultWeightCacheType;
     protected int psfType = defaultPSFType;
     protected int psiInit = defaultPsiInit;
@@ -194,7 +195,7 @@ public class Deconvolution implements FusionExportInterface
     protected boolean additionalSmoothBlending = defaultAdditionalSmoothBlending;
     protected boolean groupTiles = defaultGroupTiles;
     protected boolean groupIllums = defaultGroupIllums;
-    protected int splittingType = defaultSplittingType;
+    protected FusionGroup splittingType = defaultSplittingType;
     protected int imgExport = defaultImgExportAlgorithm;
     protected long[] maxBlock = null;
     protected String psiStartFile = "";
@@ -242,15 +243,9 @@ public class Deconvolution implements FusionExportInterface
         }
     }
 
-    @Override
-    public SpimData2 getSpimData() { return spimData; }
-
-    @Override
-    public List< ViewId > getViews() { return views; }
 
     public BoundingBox getBoundingBox() { return allBoxes.get( boundingBox ); }
 
-    @Override
     public Interval getDownsampledBoundingBox()
     {
         if ( !Double.isNaN( downsampling ) )
@@ -259,21 +254,11 @@ public class Deconvolution implements FusionExportInterface
             return getBoundingBox();
     }
 
-    @Override
-    public int getPixelType() { return 0; }
+    public boolean isAdjustIntensities() {
+        return adjustIntensities;
+    }
 
-    @Override
-    public double getDownsampling(){ return downsampling; }
-
-    @Override
-    public double getAnisotropyFactor() { return Double.NaN; }
-
-    public boolean adjustIntensities() { return adjustIntensities; }
-
-    @Override
-    public int getSplittingType() { return splittingType; }
-
-    public ImgDataType getInputImgCacheType() { return ImgDataType.values()[ cacheTypeInputImg ]; }
+    public ImgDataType getInputImgCacheType() {return cacheTypeInputImg ; }
     public ImgDataType getWeightCacheType() { return ImgDataType.values()[ cacheTypeWeights ]; }
     public PSFTYPE getPSFType() { return PSFTYPE.values()[ psfType ]; }
     public double getOSEMSpeedUp() { return osemSpeedup; }
@@ -312,10 +297,13 @@ public class Deconvolution implements FusionExportInterface
             return new PsiInitFromFileFactory( new File( psiStartFile ), preciseAvgMax );
     }
 
-    @Override
-    public ImgExport getNewExporterInstance() { return exportTiff; }
+    public double getDownsampling() {
+        if ( downsampling == 1.0 )
+            downsampling = Double.NaN;
+        return downsampling;
+    }
 
-    public boolean queryDetails()
+    public boolean checkParams()
     {
         if ( maxDimPSF == null )
             return false;
@@ -348,15 +336,13 @@ public class Deconvolution implements FusionExportInterface
         psiFactory = new CellImgFactory<>( psiCopyBlockSize );
         copyFactory = new CellImgFactory<>( psiCopyBlockSize );
 
-        if ( !getBlendingAndGrouping() )
-            return false;
 
         if ( !getComputeDevice() )
             return false;
 
         IOFunctions.println( new Date( System.currentTimeMillis() ) + ": Selected (MultiView)Deconvolution Parameters: " );
         IOFunctions.println( "Bounding Box: " + getBoundingBox() );
-        IOFunctions.println( "Downsampling: " + DownsampleTools.printDownsampling( getDownsampling() ) );
+        IOFunctions.println( "Downsampling: " + DownsampleTools.printDownsampling( downsampling ) );
         IOFunctions.println( "Downsampled Bounding Box: " + getDownsampledBoundingBox() );
         IOFunctions.println( "Input Image Cache Type: " + FusionTools.imgDataTypeChoice[ getInputImgCacheType().ordinal() ] );
         IOFunctions.println( "Weight Cache Type: " + FusionTools.imgDataTypeChoice[ getWeightCacheType().ordinal() ] );
@@ -382,7 +368,7 @@ public class Deconvolution implements FusionExportInterface
         IOFunctions.println( "Additional smooth blending: " + additionalSmoothBlending );
         IOFunctions.println( "Group tiles: " + groupTiles );
         IOFunctions.println( "Group illums: " + groupIllums );
-        IOFunctions.println( "Split by: " + splittingTypes[ getSplittingType() ] );
+        IOFunctions.println( "Split by: " +  splittingType  );
 //        IOFunctions.println( "Image Export: " + imgExportDescriptions[ imgExport ] );
         IOFunctions.println( "ImgLoader.isVirtual(): " + isImgLoaderVirtual() );
         IOFunctions.println( "ImgLoader.isMultiResolution(): " + isMultiResolution() );
@@ -393,11 +379,6 @@ public class Deconvolution implements FusionExportInterface
     public boolean isImgLoaderVirtual() { return FusionGUI.isImgLoaderVirtual( spimData ); }
     public boolean isMultiResolution() { return FusionGUI.isMultiResolution( spimData ); }
 
-    public List< Group< ViewDescription > > getFusionGroups()
-    {
-        System.out.println("fusion");
-        return FusionGUI.getFusionGroups( getSpimData(), getViews(), getSplittingType() );
-    }
 
     public List< Group< ViewDescription > > getDeconvolutionGrouping( final Group< ViewDescription > group )
     {
@@ -511,7 +492,7 @@ public class Deconvolution implements FusionExportInterface
             gd.addMessage( "Note: this values defines the block size for the deconvolved & copied images", GUIHelper.smallStatusFont );
             gd.addMessage( "" );
 
-            if ( cacheTypeInputImg == 1 || cacheTypeWeights == 1 )
+            if ( cacheTypeInputImg == ImgDataType.CACHED || cacheTypeWeights == 1 )
             {
                 gd.addNumericField( "Cache_block_size", defaultCacheBlockSize, 0 );
                 gd.addNumericField( "Cache_max num blocks", defaultCacheMaxNumBlocks, 0 );
@@ -533,7 +514,7 @@ public class Deconvolution implements FusionExportInterface
 
             this.psiCopyBlockSize = defaultPsiCopyBlockSize = Math.max( 1, (int)Math.round( gd.getNextNumber() ) );
 
-            if ( cacheTypeInputImg == 1 || cacheTypeWeights == 1 )
+            if ( cacheTypeInputImg == ImgDataType.CACHED || cacheTypeWeights == 1 )
             {
                 this.cacheBlockSize = defaultCacheBlockSize = Math.max( 1, (int)Math.round( gd.getNextNumber() ) );
                 this.cacheMaxNumBlocks = defaultCacheMaxNumBlocks = Math.max( 1, (int)Math.round( gd.getNextNumber() ) );
@@ -626,58 +607,6 @@ public class Deconvolution implements FusionExportInterface
         return true;
     }
 
-    protected boolean getBlendingAndGrouping()
-    {
-        if ( adjustBlending )
-        {
-            final GenericDialog gd = new GenericDialog( "Adjust blending & grouping parameters" );
-
-            gd.addSlider( "Blending_boundary (pixels)", -50, 50, defaultBlendingBorder );
-            gd.addSlider( "Blending_range (pixels)", 0, 100, defaultBlendingRange );
-            gd.addCheckbox( "Additional_smooth_blending", defaultAdditionalSmoothBlending );
-
-            gd.addMessage( "" );
-
-            gd.addMessage( "Note: both sizes are in coordinates of the deconvolved image. If you experience stripy artifacts, try to\n" +
-                    " - increase the blending boundary\n" +
-                    " - increase the blending range\n" +
-                    " - make sure you use \"Blurred, fused image\" as initialization for the deconvolved image (main dialog)\n" +
-                    " - enable \"Additional smooth blending\" \n" +
-                    "The blending range is independent of the downsampling. The blending boundary will be adjusted for downsampling,\n" +
-                    "please choose it relative to the PSF size (<50%). The boundary pixels describe a range of pixels at the edge of\n" +
-                    "each input that are discarded. A negative blending boundary value means that the deconvolution will make an\n" +
-                    "educated guess even for pixels that were not imaged, based on the fact that parts of their signal is visible due\n" +
-                    "to the PSF", GUIHelper.smallStatusFont );
-
-            gd.addMessage( "" );
-
-            if ( splittingType <= 2 )
-                gd.addCheckbox( "Group_tiles into one view", defaultGroupTiles );
-            if ( splittingType == 0 || splittingType == 2 )
-                gd.addCheckbox( "Group_illuminations into one view", defaultGroupIllums );
-
-            gd.showDialog();
-
-            if ( gd.wasCanceled() )
-                return false;
-
-            blendingBorder = defaultBlendingBorder = (float)gd.getNextNumber();
-            blendingRange = defaultBlendingRange = (float)gd.getNextNumber();
-            additionalSmoothBlending = defaultAdditionalSmoothBlending = gd.getNextBoolean();
-
-            if ( splittingType <= 2 )
-                groupTiles = defaultGroupTiles = gd.getNextBoolean();
-            else
-                groupTiles = false;
-
-            if ( splittingType == 0 || splittingType == 2 )
-                groupIllums = defaultGroupIllums = gd.getNextBoolean();
-            else
-                groupIllums = false;
-        }
-
-        return true;
-    }
 
     public static long[] maxTransformedKernel( final HashMap< ViewId, PointSpreadFunction > psfs, final ViewRegistrations vr )
     {
@@ -709,12 +638,16 @@ public class Deconvolution implements FusionExportInterface
         return maxDim;
     }
 
+    public FusionGroup getSplittingType() {
+        return splittingType;
+    }
+
     public static void main(String[] args) throws SpimDataException {
         ExecutorService executor = Executors.newFixedThreadPool(10);
         String path="/Users/Marwan/Downloads/drosophila_his-yfp/dataset.xml";
         SpimData2 spimdata = new XmlIoSpimData2("").load(path);
         List<ViewId> views = new ArrayList<>(spimdata.getSequenceDescription().getViewDescriptions().keySet());
-        new Deconvolution(spimdata,views,executor).queryDetails();
+        new Deconvolution(spimdata,views,executor).checkParams();
     }
 
 
