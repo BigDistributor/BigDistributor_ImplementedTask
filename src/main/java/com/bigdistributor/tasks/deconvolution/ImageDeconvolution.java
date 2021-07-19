@@ -22,6 +22,8 @@
  */
 package com.bigdistributor.tasks.deconvolution;
 
+import com.bigdistributor.tasks.deconvolution.mv.MultiViewDeconvolution;
+import com.bigdistributor.tasks.deconvolution.spark.DistMultiViewDeconvolutionMul;
 import mpicbg.spim.data.SpimDataException;
 import mpicbg.spim.data.sequence.ViewDescription;
 import mpicbg.spim.data.sequence.ViewId;
@@ -37,13 +39,9 @@ import net.preibisch.mvrecon.fiji.spimdata.XmlIoSpimData2;
 import net.preibisch.mvrecon.process.deconvolution.DeconView;
 import net.preibisch.mvrecon.process.deconvolution.DeconViewPSF.PSFTYPE;
 import net.preibisch.mvrecon.process.deconvolution.DeconViews;
-import net.preibisch.mvrecon.process.deconvolution.MultiViewDeconvolution;
-import net.preibisch.mvrecon.process.deconvolution.MultiViewDeconvolutionMul;
-import net.preibisch.mvrecon.process.deconvolution.MultiViewDeconvolutionSeq;
 import net.preibisch.mvrecon.process.deconvolution.init.PsiInitFactory;
 import net.preibisch.mvrecon.process.deconvolution.iteration.ComputeBlockThreadFactory;
 import net.preibisch.mvrecon.process.deconvolution.iteration.mul.ComputeBlockMulThreadCPUFactory;
-import net.preibisch.mvrecon.process.deconvolution.iteration.sequential.ComputeBlockSeqThread;
 import net.preibisch.mvrecon.process.deconvolution.util.PSFPreparation;
 import net.preibisch.mvrecon.process.deconvolution.util.ProcessInputImages;
 import net.preibisch.mvrecon.process.export.Calibrateable;
@@ -52,6 +50,8 @@ import net.preibisch.mvrecon.process.fusion.FusionTools;
 import net.preibisch.mvrecon.process.fusion.FusionTools.ImgDataType;
 import net.preibisch.mvrecon.process.interestpointregistration.TransformationTools;
 import net.preibisch.mvrecon.process.interestpointregistration.pairwise.constellation.grouping.Group;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -195,7 +195,7 @@ public class ImageDeconvolution  {
 
                 for (final Group<ViewDescription> virtualView : Group.getGroupsSorted(fusion.getGroups())) {
                     System.out.println("all:"+Group.getGroupsSorted(fusion.getGroups()).size());
-                    System.out.println(1); System.out.println(1); System.out.println(1); System.out.println(1);
+
                     final DeconView view = new DeconView(
                             service,
                             fusion.getImages().get(virtualView),
@@ -208,17 +208,21 @@ public class ImageDeconvolution  {
 
                     if (view.getNumBlocks() <= 0)
                         return false;
-                    System.out.println(2); System.out.println(2); System.out.println(2);
+
                     view.setTitle(Group.gvids(virtualView));
                     deconViews.add(view);
-                    System.out.println(1); System.out.println(1); System.out.println(1);
+
                     IOFunctions.println("(" + new Date(System.currentTimeMillis()) + "): Added " + view);
                 }
 
                 final DeconViews views = new DeconViews(deconViews, service);
 
                 final MultiViewDeconvolution<?> mvDecon;
+                SparkConf sparkConf = new SparkConf().setAppName("TestDeconvolution").set("spark.serializer", "org.apache.spark.serializer.KryoSerializer").setMaster("local");
 
+//                final SparkContext sc = new SparkContext(sparkConf);
+//                final JavaSparkContext sparkContext = new JavaSparkContext(sc);
+                final JavaSparkContext sparkContext = null;
                 if (mul) {
                     if (!ComputeBlockMulThreadCPUFactory.class.isInstance(cptf)) {
                         IOFunctions.println("For multiplicative deconvolution only CPU is supported so far, sorry. Please open a github issue and I'll implement it.");
@@ -227,9 +231,13 @@ public class ImageDeconvolution  {
                     }
 
                     ((ComputeBlockMulThreadCPUFactory) cptf).setNumViews(deconVirtualViews.size());
-                    mvDecon = new MultiViewDeconvolutionMul(views, numIterations, psiInitFactory, (ComputeBlockMulThreadCPUFactory) cptf, psiFactory);
+                    IOFunctions.println("MultiViewDeconvolutionMul:");
+                    mvDecon = new DistMultiViewDeconvolutionMul(views, numIterations, psiInitFactory, (ComputeBlockMulThreadCPUFactory) cptf, psiFactory,sparkContext);
                 } else {
-                    mvDecon = new MultiViewDeconvolutionSeq(views, numIterations, psiInitFactory, (ComputeBlockThreadFactory<ComputeBlockSeqThread>) cptf, psiFactory);
+                    IOFunctions.println("MultiViewDeconvolutionSeq:");
+
+                    mvDecon = new DistMultiViewDeconvolutionMul(views, numIterations, psiInitFactory, (ComputeBlockMulThreadCPUFactory) cptf, psiFactory,sparkContext);
+//                    mvDecon = new MultiViewDeconvolutionSeq(views, numIterations, psiInitFactory, (ComputeBlockThreadFactory<ComputeBlockSeqThread>) cptf, psiFactory);
                 }
 
                 if (!mvDecon.initWasSuccessful())

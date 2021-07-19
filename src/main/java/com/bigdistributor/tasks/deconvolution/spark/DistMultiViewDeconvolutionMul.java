@@ -31,14 +31,12 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Pair;
 import net.preibisch.legacy.io.IOFunctions;
 import net.preibisch.mvrecon.process.cuda.Block;
-import net.preibisch.mvrecon.process.deconvolution.DeconView;
 import net.preibisch.mvrecon.process.deconvolution.DeconViews;
 import net.preibisch.mvrecon.process.deconvolution.init.PsiInitFactory;
 import net.preibisch.mvrecon.process.deconvolution.iteration.ComputeBlockThread.IterationStatistics;
 import net.preibisch.mvrecon.process.deconvolution.iteration.ComputeBlockThreadFactory;
 import net.preibisch.mvrecon.process.deconvolution.iteration.mul.ComputeBlockMulThread;
 import net.preibisch.mvrecon.process.fusion.FusionTools;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
 import java.util.Date;
@@ -46,57 +44,11 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DistMultiViewDeconvolutionSeq extends DistMultiViewDeconvolution<ComputeBlockMulThread> {
+public class DistMultiViewDeconvolutionMul extends DistMultiViewDeconvolution<ComputeBlockMulThread> {
 
 
-    public DistMultiViewDeconvolutionSeq(DeconViews views, int numIterations, PsiInitFactory psiInitFactory, ComputeBlockThreadFactory<ComputeBlockMulThread> computeBlockFactory, ImgFactory<FloatType> psiFactory, JavaSparkContext context) {
+    public DistMultiViewDeconvolutionMul(DeconViews views, int numIterations, PsiInitFactory psiInitFactory, ComputeBlockThreadFactory<ComputeBlockMulThread> computeBlockFactory, ImgFactory<FloatType> psiFactory, JavaSparkContext context) {
         super(views, numIterations, psiInitFactory, computeBlockFactory, psiFactory, context);
-    }
-
-    public boolean initWasSuccessful() {
-        return max != null && testBlockIntegrity();
-    }
-
-    public boolean testBlockIntegrity() {
-        final int totalNumBlocks = views.getViews().get(0).getNumBlocks();
-        final List<List<Block>> blocks = views.getViews().get(0).getNonInterferingBlocks();
-
-        for (final DeconView view : views.getViews()) {
-            if (view.getNumBlocks() != totalNumBlocks) {
-                IOFunctions.println("only a constant number of blocks is supported.");
-                return false;
-            }
-
-            if (view.getNonInterferingBlocks().size() != blocks.size()) {
-                IOFunctions.println("only a constant number of block batches is supported.");
-                return false;
-            }
-
-            for (int i = 0; i < blocks.size(); ++i) {
-                if (blocks.get(i).size() != view.getNonInterferingBlocks().get(i).size()) {
-                    IOFunctions.println("only a constant number of blocks within batches is supported.");
-                    return false;
-                }
-
-                for (int j = 0; j < blocks.get(i).size(); ++j) {
-                    final Block blockA = blocks.get(i).get(j);
-                    final Block blockB = view.getNonInterferingBlocks().get(i).get(j);
-
-                    for (int d = 0; d < blockA.numDimensions(); ++d) {
-                        if (
-                                blockA.getBlockSize()[d] != blockB.getBlockSize()[d] ||
-                                        blockA.getEffectiveSize()[d] != blockB.getEffectiveSize()[d] ||
-                                        blockA.min(d) != blockB.min(d) ||
-                                        blockA.max(d) != blockB.max(d)) {
-                            IOFunctions.println("Block dimensions/offset/effective sizes not compatible, stopping.");
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     public void runNextIteration() {
@@ -122,7 +74,7 @@ public class DistMultiViewDeconvolutionSeq extends DistMultiViewDeconvolution<Co
         final Vector<Pair<Pair<Integer, Block>, Img<FloatType>>> currentBlockWritebackQueue = new Vector<>();
 
         int batch = 0;
-        JavaRDD<List<Block>> rdd = context.parallelize(blocks);
+//        JavaRDD<List<Block>> rdd = context.parallelize(blocks);
 
 //        rdd.map
         for (final List<Block> blocksBatch : blocks) {
@@ -138,7 +90,7 @@ public class DistMultiViewDeconvolutionSeq extends DistMultiViewDeconvolution<Co
             for (int t = 0; t < computeBlockThreads.size(); ++t) {
                 final int threadId = t;
 
-                threads[threadId] = new Thread(new MultiViewDeconvolutionTask(computeBlockThreads, threadId, ai, numBlocksBatch, numBlocksBefore, blocksBatch,views,psi,threads,max,stats,totalNumBlocks,currentBlockWritebackQueue));
+                threads[threadId] = new Thread(new MultiViewDeconvolutionMulSerializableTask(computeBlockThreads, threadId, ai, numBlocksBatch, numBlocksBefore, blocksBatch,views,psi,threads,max,stats,totalNumBlocks,currentBlockWritebackQueue));
             }
 
             // run the threads that process all blocks of this batch in parallel (often, this will be just one thread)

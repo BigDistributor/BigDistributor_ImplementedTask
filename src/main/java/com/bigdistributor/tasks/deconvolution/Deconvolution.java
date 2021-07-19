@@ -136,7 +136,7 @@ public class Deconvolution
     public static ImgDataType defaultInputImgCacheType = ImgDataType.CACHED;
     public static double defaultDownsampling = 8.0;
     public static boolean defaultAdjustIntensities = false;
-    public static boolean defaultMul = false;
+    public static boolean defaultMul = true;
     public static int defaultPSFType = 1;
     public static int defaultPsiInit = 0;
     public static double defaultOsemSpeedup = 1;

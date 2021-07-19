@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MultiViewDeconvolutionTask implements Runnable {
+public class MultiViewDeconvolutionMulSerializableTask implements Runnable {
 
     private final ArrayList<ComputeBlockMulThread> computeBlockThreads;
     private final int threadId;
@@ -36,7 +36,7 @@ public class MultiViewDeconvolutionTask implements Runnable {
     private final Vector<Pair<Pair<Integer, Block>, Img<FloatType>>> currentBlockWritebackQueue;
 
 
-    public MultiViewDeconvolutionTask(ArrayList<ComputeBlockMulThread> computeBlockThreads, int threadId, AtomicInteger ai, int numBlocksBatch, int numBlocksBefore, List<Block> blocksBatch, DeconViews views, Img<FloatType> psi, Thread[] threads, float[] max, Vector<ComputeBlockThread.IterationStatistics> stats, int totalNumBlocks, Vector<Pair<Pair<Integer, Block>, Img<FloatType>>> currentBlockWritebackQueue) {
+    public MultiViewDeconvolutionMulSerializableTask(ArrayList<ComputeBlockMulThread> computeBlockThreads, int threadId, AtomicInteger ai, int numBlocksBatch, int numBlocksBefore, List<Block> blocksBatch, DeconViews views, Img<FloatType> psi, Thread[] threads, float[] max, Vector<ComputeBlockThread.IterationStatistics> stats, int totalNumBlocks, Vector<Pair<Pair<Integer, Block>, Img<FloatType>>> currentBlockWritebackQueue) {
         this.computeBlockThreads = computeBlockThreads;
         this.threadId = threadId;
         this.ai = ai;
