@@ -20,13 +20,13 @@ public class Dispatcher {
         String task = args[0];
         if (task.equalsIgnoreCase("get")) {
             showTasks();
-        }
+        }else{
 
         Class<BlockTask> application = getApplications(task);
         if (application == null)
             throw new RuntimeException("Task not exist");
         String[] taskArgs = Arrays.copyOfRange(args, 1, args.length);
-        int exitCode = new CommandLine(new AWSSparkDistributor<>(application)).execute(taskArgs);
+        int exitCode = new CommandLine(new AWSSparkDistributor<>(application)).execute(taskArgs);}
     }
 
     private void showTasks() {

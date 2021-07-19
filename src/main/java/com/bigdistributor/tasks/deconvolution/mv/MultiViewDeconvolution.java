@@ -1,5 +1,3 @@
-package com.bigdistributor.tasks.deconvolution;
-
 /*-
  * #%L
  * Software for the reconstruction of multi-view microscopic acquisitions
@@ -22,6 +20,7 @@ package com.bigdistributor.tasks.deconvolution;
  * <http://www.gnu.org/licenses/gpl-2.0.html>.
  * #L%
  */
+package com.bigdistributor.tasks.deconvolution.mv;
 
 import ij.CompositeImage;
 import ij.IJ;
@@ -61,32 +60,32 @@ public abstract class MultiViewDeconvolution< C extends ComputeBlockThread >
     public static boolean additionalSmoothBlending = false;
 
     // current iteration
-    int it = 0;
+    protected int it = 0;
 
     // the multi-view deconvolved image
-    final Img< FloatType > psi;
+    protected final Img< FloatType > psi;
 
     // the input data
-    final DeconViews views;
+    protected final DeconViews views;
 
     // max intensities for each contributing view, ordered as in views
-    final float[] max;
+    protected final float[] max;
 
-    final int numIterations;
-    final double avgMax;
+    protected final int numIterations;
+    protected final double avgMax;
 
-    boolean debug = false;
-    int debugInterval = 1;
+    protected boolean debug = false;
+    protected int debugInterval = 1;
 
     // the thread that will compute the iteration for each block independently
     final ComputeBlockThreadFactory< C > computeBlockFactory;
 
     // the actual block compute threads
-    final ArrayList< C > computeBlockThreads;
+    protected final ArrayList< C > computeBlockThreads;
 
     // for debug
-    ImageStack stack;
-    CompositeImage ci;
+    protected ImageStack stack;
+    protected CompositeImage ci;
 
     public MultiViewDeconvolution(
             final DeconViews views,
@@ -202,8 +201,7 @@ public abstract class MultiViewDeconvolution< C extends ComputeBlockThread >
 
     public abstract void runNextIteration();
 
-//    protected static final void writeN5Block(final N5Writer writer, long[] position)
-    protected static final void writeBack( final Img< FloatType > psi, final Vector< Pair< Pair< Integer, Block >, Img< FloatType > > > blockWritebackQueue )
+    protected static void writeBack( final Img< FloatType > psi, final Vector< Pair< Pair< Integer, Block >, Img< FloatType > > > blockWritebackQueue )
     {
         for ( final Pair< Pair< Integer, Block >, Img< FloatType > > writeBackBlock : blockWritebackQueue )
         {

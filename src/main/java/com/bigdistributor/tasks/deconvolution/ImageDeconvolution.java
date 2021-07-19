@@ -95,7 +95,7 @@ public class ImageDeconvolution  {
         final Deconvolution decon = new Deconvolution(spimData, viewList, service);
 
         if (!decon.checkParams()){
-            System.out.println("Invalid task params");
+            System.out.println("Invalid Deconvolution task params! Exit.." );
             return false;}
 
         // query exporter parameters
